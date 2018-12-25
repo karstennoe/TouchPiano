@@ -120,7 +120,7 @@ namespace WSTouchPiano {
     }
 
     export function TP_SetRandomRGB(): number {
-        return TP_SetRGB(Math.random(256), Math.random(256), Math.random(256));
+        return TP_SetRGB(Math.randomRange(0,255), Math.randomRange(0,255), Math.randomRange(0,255));
     }
 
 	/**
