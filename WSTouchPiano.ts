@@ -34,6 +34,8 @@ enum TP_PIANO {
     C1 = 0x1000,
 }
 
+let freqs = [262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494, 523];
+
 /**
  * RGBLED order.
  */
@@ -73,6 +75,17 @@ enum RGB_COLOR {
  */
 //% weight=20 color=#3333FF icon="\uf001"
 namespace WSTouchPiano {
+
+	/**
+	* GetRandomNoteFreq
+	*/
+    //% blockId="TP_GetRandomNoteFreq" block="Get random note frequency"
+    //% weight=80 blockGap=8
+    export function TP_GetRandomNoteFreq(): number {
+        return freqs[Math.randomRange(0, 14)];
+    }
+
+
     //% blockId=tp_press 
     //% block="Key|%index|is pressed"
     //% weight=100
@@ -120,7 +133,7 @@ namespace WSTouchPiano {
     }
 
     export function TP_SetRandomRGB(): number {
-        return TP_SetRGB(Math.randomRange(0,255), Math.randomRange(0,255), Math.randomRange(0,255));
+        return TP_SetRGB(Math.randomRange(0, 256), Math.randomRange(0, 256), Math.randomRange(0, 255));
     }
 
 	/**
@@ -153,6 +166,44 @@ namespace WSTouchPiano {
     export function TP_PlayMusic(frequency: number, ms: number): void {
         pins.analogPitch(frequency, ms);
     }
+
+    /**
+    * Play the notes
+    */
+    //% blockId==TP_KeyToFreq" block="Key to frequency|key: %key"
+    //% weight=60
+    export function TP_KeyToFreq(key: TP_PIANO): number {
+        if (key == TP_PIANO.C) {
+            return 262;
+        } else if (key == TP_PIANO.bD) {
+            return 277;
+        } else if (key == TP_PIANO.D) {
+            return 294;
+        } else if (key == TP_PIANO.bE) {
+            return 311;
+        } else if (key == TP_PIANO.E) {
+            return 330;
+        } else if (key == TP_PIANO.F) {
+            return 349;
+        } else if (key == TP_PIANO.bG) {
+            return 370;
+        } else if (key == TP_PIANO.G) {
+            return 392;
+        } else if (key == TP_PIANO.bA) {
+            return 415;
+        } else if (key == TP_PIANO.A) {
+            return 440;
+        } else if (key == TP_PIANO.bB) {
+            return 466;
+        } else if (key == TP_PIANO.B) {
+            return 494;
+        } else if (key == TP_PIANO.C1) {
+            return 523;
+        } else
+            return 0;
+    }
+
+
 
     /**
     * Play the notes
@@ -215,4 +266,57 @@ namespace WSTouchPiano {
         if (TPval != 0xffff)
             play = TPval;
     }
+
+    /**
+    * Get key pressed
+    */
+    //% blockId==TP_GetKeyPressed" block="Get key pressed"
+    //% weight=60
+    export function TP_GetKeyPressed(): TP_PIANO {
+        //pins.analogSetPitchPin(AnalogPin.P0);
+        let TPval = pins.i2cReadNumber(0x57, NumberFormat.UInt16BE);
+        let temp = TPval >> 8;
+        TPval = (TPval << 8) | temp;
+
+        if (TPval & TP_PIANO.C) {
+            return TP_PIANO.C;
+        } else if (TPval & TP_PIANO.bD) {
+            return TP_PIANO.bD;
+        } else if (TPval & TP_PIANO.D) {
+            return TP_PIANO.D;
+        } else if (TPval & TP_PIANO.bE) {
+            return TP_PIANO.bE;
+        } else if (TPval & TP_PIANO.E) {
+            return TP_PIANO.E;
+        } else if (TPval & TP_PIANO.F) {
+            return TP_PIANO.F;
+        } else if (TPval & TP_PIANO.bG) {
+            return TP_PIANO.bG;
+        } else if (TPval & TP_PIANO.G) {
+            return TP_PIANO.G;
+        } else if (TPval & TP_PIANO.bA) {
+            return TP_PIANO.bA;
+        } else if (TPval & TP_PIANO.A) {
+            return TP_PIANO.A;
+        } else if (TPval & TP_PIANO.bB) {
+            return TP_PIANO.bB;
+        } else if (TPval & TP_PIANO.B) {
+            return TP_PIANO.B;
+        } else if (TPval & TP_PIANO.C1) {
+            return TP_PIANO.C1;
+        } else if (TPval == TP_PIANO.None) {
+            return TP_PIANO.None;
+        }
+        else
+            return TP_PIANO.None;
+    }
+    /**
+    * Get frequency of note pressed
+    */
+    //% blockId==TP_GetFreqOfKeyPressed" block="Get frequency of note pressed"
+    //% weight=60
+    export function TP_GetFreqOfKeyPressed(): number {
+        return TP_KeyToFreq(TP_GetKeyPressed())
+    }
+
 }
